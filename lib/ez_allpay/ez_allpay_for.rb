@@ -11,24 +11,24 @@ module EzAllpay
 
     def ez_allpay_for(records, default_settings = {})
       button_settings(default_settings)
-      
+
       #EzAllpay::EzAllpayFor.record_options = record
 
-      
+
 
       EzAllpay.item_options[:MerchantID] = EzAllpay.merchant_id
       EzAllpay.item_options[:ReturnURL] = EzAllpay.return_url
       EzAllpay.item_options[:ChoosePayment] = EzAllpay.choose_payment if EzAllpay.choose_payment.present?
 
       yield
-      
-      add_record_to_item_options(records)
+
+      create_action(EzAllpay.item_options.merge(default_settings))
 
       create_action(EzAllpay.item_options)
     end
 
     def create_action(options)
-      form_body = tag_form_create
+      form_body = tag_form_create(options)
       form_tags = tag_params_adder(options)
       form_key_tag = tag_key_adder
       (form_body + form_tags.join("") + form_key_tag + submit_tag_adder).html_safe
@@ -38,7 +38,7 @@ module EzAllpay
       @@button_value = settings[:setting][:value]
       @@button_style = settings[:setting][:css]
     end
-    
+
     # 將 item_options 取代為 model record value
     def add_record_to_item_options(records)
       EzAllpay.item_options.each do |key, key_instead|
@@ -48,20 +48,20 @@ module EzAllpay
               record.each do |record_key|
                 if record_key.respond_to?(key_instead)
                   case key
-                    when :MerchantTradeDate
-                      EzAllpay.item_options[key] = record_key[key_instead].strftime("%Y/%m/%d %H:%M:%S")
-                    else
-                      EzAllpay.item_options[key] = record_key[key_instead]
+                  when :MerchantTradeDate
+                    EzAllpay.item_options[key] = record_key[key_instead].strftime("%Y/%m/%d %H:%M:%S")
+                  else
+                    EzAllpay.item_options[key] = record_key[key_instead]
                   end
                 end
               end
             else
               if record.respond_to?(key_instead)
                 case key
-                  when :MerchantTradeDate
-                    EzAllpay.item_options[key] = record[key_instead].strftime("%Y/%m/%d %H:%M:%S")
-                  else
-                    EzAllpay.item_options[key] = record[key_instead]
+                when :MerchantTradeDate
+                  EzAllpay.item_options[key] = record[key_instead].strftime("%Y/%m/%d %H:%M:%S")
+                else
+                  EzAllpay.item_options[key] = record[key_instead]
                 end
               end
             end
@@ -69,10 +69,10 @@ module EzAllpay
         else
           if records.respond_to?(key_instead)
             case key
-              when :MerchantTradeDate
-                EzAllpay.item_options[key] = records[key_instead].strftime("%Y/%m/%d %H:%M:%S")
-              else
-                EzAllpay.item_options[key] = records[key_instead]
+            when :MerchantTradeDate
+              EzAllpay.item_options[key] = records[key_instead].strftime("%Y/%m/%d %H:%M:%S")
+            else
+              EzAllpay.item_options[key] = records[key_instead]
             end
           end
         end
@@ -88,7 +88,7 @@ module EzAllpay
     ###
     def attr_instead(set_options)
       set_options.each do |key, key_instead|
-          EzAllpay.item_options[key] = key_instead
+        EzAllpay.item_options[key] = key_instead
       end
     end
 
