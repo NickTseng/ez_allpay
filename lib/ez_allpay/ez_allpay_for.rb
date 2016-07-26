@@ -18,7 +18,7 @@ module EzAllpay
 
       EzAllpay.item_options[:MerchantID] = EzAllpay.merchant_id
       EzAllpay.item_options[:ReturnURL] = EzAllpay.return_url
-      EzAllpay.item_options[:ChoosePayment] = EzAllpay.choose_payment
+      EzAllpay.item_options[:ChoosePayment] = EzAllpay.choose_payment if EzAllpay.choose_payment.present?
 
       add_record_to_item_options(records)
 
