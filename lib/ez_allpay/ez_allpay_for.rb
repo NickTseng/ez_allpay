@@ -14,12 +14,14 @@ module EzAllpay
       
       #EzAllpay::EzAllpayFor.record_options = record
 
-      yield
+      
 
       EzAllpay.item_options[:MerchantID] = EzAllpay.merchant_id
       EzAllpay.item_options[:ReturnURL] = EzAllpay.return_url
       EzAllpay.item_options[:ChoosePayment] = EzAllpay.choose_payment if EzAllpay.choose_payment.present?
 
+      yield
+      
       add_record_to_item_options(records)
 
       create_action(EzAllpay.item_options)
